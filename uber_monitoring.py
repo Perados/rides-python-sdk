@@ -3,6 +3,7 @@
 import csv
 import pytz
 import datetime
+import pandas as pd
 
 from example.utils import import_oauth2_credentials
 from uber_rides.session import Session, OAuth2Credential
@@ -68,7 +69,7 @@ def write_combinations_to_csv(client, product_id, address_combinations):
             to_longitude = ADDRESS_LOCATION_DICT[to_place].longitude
 
             now = TZ.localize(datetime.datetime.now())
-
+            print("Gonna make call to Uber's api at {}.".format(now.isoformat()))
             estimated_ride = client.estimate_ride(
                 product_id=product_id,
                 start_latitude=from_latitude,
@@ -93,6 +94,17 @@ def write_combinations_to_csv(client, product_id, address_combinations):
             ]
 
             writer.writerow(row)
+            print("Wrote line into csv successfully.")
+
+
+def generate_filtered_csvs(address_combinations):
+    df = pd.read_csv('uber_monitoring.csv')
+    for combination in address_combinations:
+        from_place = combination[0]
+        to_place = combination[0]
+        filtered_df = df[(df['from_place'] == from_place) & (df['to_place'] == to_place)]
+        ax = filtered_df.plot(x='time', y=['low_price', 'high_price'], figsize=(20, 10), rot=90)
+        ax.set_ylim(0, 30)
 
 
 def main():

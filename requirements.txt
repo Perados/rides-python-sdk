@@ -1,2 +1,4 @@
 pytz
 geopy
+matplotlib
+pandas
